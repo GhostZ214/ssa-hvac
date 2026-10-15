@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SSA Phoenix - HVAC Roof Map (v1)</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font:13px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#222;background:#f3f3f3;display:flex;height:100vh;overflow:hidden}
@@ -28,7 +28,41 @@ table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid 
 #pop b.t{font-size:14px}#pop .st{display:inline-block;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:bold;margin:3px 0}
 #pop .note{color:#555;font-size:11.5px;margin-top:4px}#pop a{font-weight:bold}
 #zoomtxt{display:inline-block;width:42px;text-align:center}
-</style></head><body>
+</style><!-- responsive (injected) -->
+<style id="resp-css">
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{overflow-x:hidden}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+img{max-width:100%}
+#pop,.pop{max-width:calc(100vw - 16px)!important;box-sizing:border-box;overflow-wrap:anywhere}
+.m.open{z-index:20}
+@media (pointer:coarse){
+ .pin::after,.mk::after,.m::after{content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;min-width:100%;min-height:100%;transform:translate(-50%,-50%);border-radius:50%}
+ .pin,.mk,.m{touch-action:manipulation}
+ button,.btn,select{min-height:44px;min-width:44px}
+ #pop .x{min-width:44px;min-height:44px;top:0!important;right:0!important;display:flex;align-items:center;justify-content:center}
+ #pop a,.pop a,#panel a{display:inline-flex;align-items:center;min-height:44px}
+ label{display:inline-flex;align-items:center;min-height:44px}
+ input[type=checkbox],input[type=radio]{width:22px;height:22px}
+ input[type=range]{min-height:44px}
+}
+@media (max-width:600px){
+ body{font-size:15px}
+ header,body>h1:first-of-type{padding-right:calc(112px + env(safe-area-inset-right))!important;padding-top:calc(10px + env(safe-area-inset-top))!important}
+ header h1,body>h1{font-size:18px!important}
+ .legend,.ctl,.bar,.sub,.side,footer,#panel,.key{font-size:14px!important}
+ #pop{font-size:14px!important}
+ #wrap>#pop{width:max-content}
+ .pop{width:min(240px,calc(100vw - 24px))!important}
+ /* SSA Phoenix: stack map above the side panel */
+ body.resp-stack{display:block!important;height:auto!important;overflow-y:auto!important}
+ body.resp-stack #wrap{height:65vh;height:65dvh}
+ body.resp-stack #side{width:auto!important;min-width:0!important;border-right:0!important;padding-top:calc(60px + env(safe-area-inset-top))!important}
+ /* Tucson High: let the map area size itself under a wrapping header */
+ #main{height:65vh!important;height:65dvh!important}
+}
+</style>
+</head><body>
 <div id="side">
 <h1>Sonoran Science Academy Phoenix &ndash; HVAC roof map</h1>
 <div class="sub">3535 E McDowell Rd (35th St &amp; McDowell). First version. Base: Esri World Imagery z19 (~0.25 m/px), north up.</div>
@@ -129,4 +163,17 @@ upd();fit();const h=location.hash.slice(1);if(AREAS[h])goto(h);
 document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href]');if(a&&/^https?:\/\/docs\.google\.com\//.test(a.href)&&a.target!=='_blank'){a.target='_blank';a.rel='noopener';}},true);
 document.querySelectorAll('a[href*="docs.google.com"]').forEach(function(a){if(a.target!=='_blank'){a.target='_blank';a.rel='noopener';}});
 </script>
+<!-- responsive (injected) -->
+<script id="resp-js">(function(){
+ /* SSA Phoenix: on phones put the map first */
+ var s=document.getElementById('side'),w=document.getElementById('wrap');
+ if(s&&w&&s.nextElementSibling===w&&innerWidth<=600){document.body.classList.add('resp-stack');document.body.insertBefore(w,s);if(window.fit)setTimeout(fit,50);}
+ /* keep popups fully on screen */
+ function clamp(){document.querySelectorAll('#pop,.pop').forEach(function(p){
+  if(getComputedStyle(p).display==='none')return;var r=p.getBoundingClientRect(),vw=document.documentElement.clientWidth,d=0;
+  if(r.right>vw-8)d=r.right-(vw-8);if(r.left-d<8)d=r.left-8;
+  if(d){var l=parseFloat(getComputedStyle(p).left)||0;p.style.left=(l-d)+'px';}});}
+ document.addEventListener('click',function(){setTimeout(clamp,0);setTimeout(clamp,120)},true);
+ addEventListener('resize',clamp);addEventListener('hashchange',function(){setTimeout(clamp,150)});setTimeout(clamp,300);
+})();</script>
 </body></html>

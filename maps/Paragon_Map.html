@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<!doctype html><html><head><meta charset=utf-8><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Paragon Science Academy - Main Building Roof Map</title><style>
 body{font-family:system-ui,Arial;margin:0;background:#f4f4f4}header{padding:10px 14px;background:#1d3a8a;color:#fff}
 .ctl{padding:8px 14px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:14px}
@@ -11,7 +11,41 @@ body{font-family:system-ui,Arial;margin:0;background:#f4f4f4}header{padding:10px
 .ok{border-color:#1428c8;color:#1428c8}.guess{border-color:#e08a00;color:#b36d00}.unk{border-color:#d00;color:#d00}.off{border-color:#777;color:#555}
 #pop{position:absolute;display:none;background:#fff;border:1px solid #999;border-radius:6px;padding:8px 10px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:9;max-width:300px}
 #pop a{display:block;margin:3px 0}.legend span{margin-right:12px}.side{max-width:1160px;margin:10px auto;padding:0 14px;font-size:14px}
-</style></head><body><header><b>Paragon Science Academy - Main Building Roof</b> &nbsp; Click a unit to open its row on the master list</header>
+</style><!-- responsive (injected) -->
+<style id="resp-css">
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{overflow-x:hidden}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+img{max-width:100%}
+#pop,.pop{max-width:calc(100vw - 16px)!important;box-sizing:border-box;overflow-wrap:anywhere}
+.m.open{z-index:20}
+@media (pointer:coarse){
+ .pin::after,.mk::after,.m::after{content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;min-width:100%;min-height:100%;transform:translate(-50%,-50%);border-radius:50%}
+ .pin,.mk,.m{touch-action:manipulation}
+ button,.btn,select{min-height:44px;min-width:44px}
+ #pop .x{min-width:44px;min-height:44px;top:0!important;right:0!important;display:flex;align-items:center;justify-content:center}
+ #pop a,.pop a,#panel a{display:inline-flex;align-items:center;min-height:44px}
+ label{display:inline-flex;align-items:center;min-height:44px}
+ input[type=checkbox],input[type=radio]{width:22px;height:22px}
+ input[type=range]{min-height:44px}
+}
+@media (max-width:600px){
+ body{font-size:15px}
+ header,body>h1:first-of-type{padding-right:calc(112px + env(safe-area-inset-right))!important;padding-top:calc(10px + env(safe-area-inset-top))!important}
+ header h1,body>h1{font-size:18px!important}
+ .legend,.ctl,.bar,.sub,.side,footer,#panel,.key{font-size:14px!important}
+ #pop{font-size:14px!important}
+ #wrap>#pop{width:max-content}
+ .pop{width:min(240px,calc(100vw - 24px))!important}
+ /* SSA Phoenix: stack map above the side panel */
+ body.resp-stack{display:block!important;height:auto!important;overflow-y:auto!important}
+ body.resp-stack #wrap{height:65vh;height:65dvh}
+ body.resp-stack #side{width:auto!important;min-width:0!important;border-right:0!important;padding-top:calc(60px + env(safe-area-inset-top))!important}
+ /* Tucson High: let the map area size itself under a wrapping header */
+ #main{height:65vh!important;height:65dvh!important}
+}
+</style>
+</head><body><header><b>Paragon Science Academy - Main Building Roof</b> &nbsp; Click a unit to open its row on the master list</header>
 <div class=ctl>Floor map overlay: <label><input type=radio name=o value=0 checked> None</label><label><input type=radio name=o value=1> 1st floor</label><label><input type=radio name=o value=2> 2nd floor</label>
 Opacity <input type=range id=op min=0 max=100 value=70><label><input type=checkbox id=lb checked> Labels</label>
 <span class=legend><span style=color:#1428c8>&#9679; identified</span><span style=color:#b36d00>&#9679; position guessed</span><span style=color:#d00>&#9679; unidentified</span><span style=color:#555>&#9679; capped off</span></span></div>
@@ -38,4 +72,17 @@ document.getElementById('lb').onchange=e=>document.querySelectorAll('.pin span')
 document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href]');if(a&&/^https?:\/\/docs\.google\.com\//.test(a.href)&&a.target!=='_blank'){a.target='_blank';a.rel='noopener';}},true);
 document.querySelectorAll('a[href*="docs.google.com"]').forEach(function(a){if(a.target!=='_blank'){a.target='_blank';a.rel='noopener';}});
 </script>
+<!-- responsive (injected) -->
+<script id="resp-js">(function(){
+ /* SSA Phoenix: on phones put the map first */
+ var s=document.getElementById('side'),w=document.getElementById('wrap');
+ if(s&&w&&s.nextElementSibling===w&&innerWidth<=600){document.body.classList.add('resp-stack');document.body.insertBefore(w,s);if(window.fit)setTimeout(fit,50);}
+ /* keep popups fully on screen */
+ function clamp(){document.querySelectorAll('#pop,.pop').forEach(function(p){
+  if(getComputedStyle(p).display==='none')return;var r=p.getBoundingClientRect(),vw=document.documentElement.clientWidth,d=0;
+  if(r.right>vw-8)d=r.right-(vw-8);if(r.left-d<8)d=r.left-8;
+  if(d){var l=parseFloat(getComputedStyle(p).left)||0;p.style.left=(l-d)+'px';}});}
+ document.addEventListener('click',function(){setTimeout(clamp,0);setTimeout(clamp,120)},true);
+ addEventListener('resize',clamp);addEventListener('hashchange',function(){setTimeout(clamp,150)});setTimeout(clamp,300);
+})();</script>
 </body></html>
