@@ -81,6 +81,16 @@ img{max-width:100%}
 .m.fp>span:not(.fpl){left:50%;transform:translateX(-50%)}
 .m.fp>.pop{font-size:13px}
 </style>
+<style id="ask-css">
+#ask-map-btn{position:fixed;z-index:2147483646;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));
+ display:flex;align-items:center;gap:6px;min-height:48px;max-width:calc(100vw - 24px);padding:0 18px;box-sizing:border-box;
+ background:#C0392B;color:#fff;font:600 16px/1.15 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;text-decoration:none;
+ border-radius:24px;border:2px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent;touch-action:manipulation;white-space:nowrap}
+#ask-map-btn:active{transform:scale(.97);opacity:.9}
+#ask-map-btn .ask-unit{display:none;font-weight:700;background:rgba(255,255,255,.22);border-radius:10px;padding:2px 7px;max-width:40vw;overflow:hidden;text-overflow:ellipsis}
+#ask-map-btn.has-unit .ask-unit{display:inline-block}
+@media (max-width:600px){#ask-map-btn{font-size:15px;padding:0 14px;min-height:46px}body::after{content:"";display:block;height:72px}}
+</style>
 </head><body>
 <header>
  <h1>Tucson High – Rooftop Units</h1>
@@ -192,5 +202,46 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(function(a){if(a
   if(d){var l=parseFloat(getComputedStyle(p).left)||0;p.style.left=(l-d)+'px';}});}
  document.addEventListener('click',function(){setTimeout(clamp,0);setTimeout(clamp,120)},true);
  addEventListener('resize',clamp);addEventListener('hashchange',function(){setTimeout(clamp,150)});setTimeout(clamp,300);
+})();</script>
+<!-- Ask about this map (injected) -->
+<a id="ask-map-btn" href="mailto:sonoran-hvac+high@mail.grokbot.com?subject=Question%20about%20the%20Tucson%20High%20map&amp;body=Your%20question%20%28unit%20tag%20if%20you%20know%20it%29%3A%0A%0A" data-to="sonoran-hvac+high@mail.grokbot.com" data-fac="Tucson High" aria-label="Ask about this map by email">&#9993; Ask about this map<span class="ask-unit"></span></a>
+<script id="ask-js">(function(){
+ var b=document.getElementById('ask-map-btn'),u=b.querySelector('.ask-unit'),to=b.dataset.to,fac=b.dataset.fac;
+ function set(tag){var s='Question about the '+fac+' map'+(tag?' \u2013 unit '+tag:''),
+  body=tag?'Unit: '+tag+'\n\nYour question:\n\n':'Your question (unit tag if you know it):\n\n';
+  b.href='mailto:'+to+'?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(body);
+  u.textContent=tag||'';b.classList.toggle('has-unit',!!tag);b.setAttribute('aria-label',tag?'Ask about unit '+tag+' by email':'Ask about this map by email');}
+ function txt(e){return e?(e.textContent||'').replace(/\s+/g,' ').trim():''}
+ function tagOf(m){var t=(m.getAttribute('title')||'').trim();
+  if(!t){var c=[].filter.call(m.children,function(k){return k.tagName==='SPAN'&&!k.classList.contains('fpl')});t=txt(c[0]);}
+  if(!t){var n=m.nextElementSibling;if(n&&(n.classList.contains('lab')||n.classList.contains('lb')))t=txt(n);}
+  if(!t)t=txt(m.querySelector('.pop b'))||txt(m.firstElementChild)||txt(m);
+  t=t.replace(/\s+\(.*$/,'');if(/^\d+$/.test(t))t='#'+t;return t.slice(0,40);}
+ var dn=null,dt=0;/* pointer capture on some maps retargets the click, so remember what was pressed */
+ document.addEventListener('pointerdown',function(e){dn=e.target;dt=Date.now();},true);
+ document.addEventListener('click',function(e){var t=e.target;if(dn&&Date.now()-dt<1500&&dn.closest&&dn.closest('.pin,.mk,.m,.lab')&&!(t&&t.closest&&t.closest('.pin,.mk,.m,.lab')))t=dn;
+  if(!t||!t.closest||t.closest('#ask-map-btn'))return;
+  var m=t.closest('.pin,.mk,.m');if(m){set(tagOf(m));return;}
+  var l=t.closest('.lab');if(l){set(txt(l).slice(0,40));return;}
+  if(!t.closest('#pop,.pop,#ipad-home-btn'))set('');},true);
+ set('');
+ /* keep the button off the units: if it covers a unit (or label) in its corner, move it to the clearest other corner */
+ var POS=[['br',{right:'calc(12px + env(safe-area-inset-right))',bottom:'calc(12px + env(safe-area-inset-bottom))',left:'auto',top:'auto'}],
+  ['bl',{left:'calc(12px + env(safe-area-inset-left))',bottom:'calc(12px + env(safe-area-inset-bottom))',right:'auto',top:'auto'}],
+  ['tl',{left:'calc(12px + env(safe-area-inset-left))',top:'calc(12px + env(safe-area-inset-top))',right:'auto',bottom:'auto'}],
+  ['tr',{right:'calc(10px + env(safe-area-inset-right))',top:'calc(64px + env(safe-area-inset-top))',left:'auto',bottom:'auto'}]],cur=0;
+ function score(){var r=b.getBoundingClientRect(),u=0,l=0;
+  [].forEach.call(document.querySelectorAll('.pin,.mk,.m,.lab,.lb,.fpl,#pop,.pop,h1'),function(e){if(e.closest('#ask-map-btn'))return;var o=e.getBoundingClientRect();
+   if(!o.width||!o.height||o.left>=r.right+4||o.right<=r.left-4||o.top>=r.bottom+4||o.bottom<=r.top-4)return;var s=getComputedStyle(e);if(s.display==='none'||s.visibility==='hidden')return;
+   if(e.matches('.pin,.mk,.m'))u++;else l++;});return u*100+l;}
+ function apply(i){var p=POS[i][1];for(var k in p)b.style[k]=p[k];b.dataset.pos=POS[i][0];}
+ var busy=0;function place(){busy=0;if(!score())return;var best=cur,bs=1e9;
+  for(var i=0;i<POS.length;i++){apply(i);var s=score();if(s<bs){bs=s;best=i;}if(!s)break;}
+  cur=best;apply(cur);}
+ function later(){if(!busy){busy=1;requestAnimationFrame(place);}}
+ apply(0);addEventListener('load',later);addEventListener('resize',later);document.addEventListener('scroll',later,true);
+ document.addEventListener('input',later,true);document.addEventListener('click',function(){setTimeout(later,150)},true);
+ document.addEventListener('touchend',function(){setTimeout(later,200)},true);document.addEventListener('wheel',later,{capture:true,passive:true});
+ setTimeout(later,400);setInterval(later,1500);
 })();</script>
 </body></html>

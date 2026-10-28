@@ -1,5 +1,5 @@
 /* Sonoran Schools HVAC - service worker (offline precache). Bump VERSION when files change. */
-const VERSION = 'ssa-hvac-v3';
+const VERSION = 'ssa-hvac-v4';
 const PRECACHE = [
   './',
   './index.html',
