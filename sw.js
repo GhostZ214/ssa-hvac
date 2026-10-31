@@ -1,5 +1,5 @@
 /* Sonoran Schools HVAC - service worker (offline precache). Bump VERSION when files change. */
-const VERSION = 'ssa-hvac-v4';
+const VERSION = 'ssa-hvac-v5';
 const PRECACHE = [
   './',
   './index.html',
@@ -39,20 +39,22 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return; // Google Sheets etc. go straight to the network
 
-  // Cache-first (ignoring ?query and #hash), fall back to network, then to the hub page.
-  event.respondWith(
-    caches.match(req, { ignoreSearch: true }).then((hit) => {
-      if (hit) return hit;
-      return fetch(req).then((res) => {
-        if (res && res.ok && res.type === 'basic') {
-          const copy = res.clone();
-          caches.open(VERSION).then((c) => c.put(req, copy));
-        }
+  // HTML pages: network-first (so updates show up right away), cached copy when offline.
+  const isPage = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+  if (isPage) {
+    event.respondWith(
+      fetch(req, { cache: 'no-cache' }).then((res) => {
+        if (res && res.ok && res.type === 'basic') { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); }
         return res;
-      }).catch(() => {
-        if (req.mode === 'navigate') return caches.match('./index.html');
-        return Response.error();
-      });
-    })
+      }).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('./index.html')))
+    );
+    return;
+  }
+  // Other assets: cache-first (ignoring ?query), fall back to network.
+  event.respondWith(
+    caches.match(req, { ignoreSearch: true }).then((hit) => hit || fetch(req).then((res) => {
+      if (res && res.ok && res.type === 'basic') { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); }
+      return res;
+    }).catch(() => Response.error()))
   );
 });

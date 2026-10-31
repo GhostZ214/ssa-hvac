@@ -91,7 +91,7 @@ footer{padding:0 calc(28px + env(safe-area-inset-right)) calc(28px + env(safe-ar
 </main>
 <footer>
   <span id="net">Online</span>Maps work offline once the app has loaded. Master sheets open in Google Sheets and need a connection and view access.
-  <br>Each map has an <b>&#9993; Ask about this map</b> button: it emails your question (tap a unit first to include its tag), and the answer comes back to you by email.
+  <br>Each map has a <b>&#128172; Message us</b> button: type your question right in the app (tap a unit first to include its tag) — no email app or sign-in needed. Robert and the bot will get back to you by email or phone.
 </footer>
 <script>
 (function(){
@@ -100,7 +100,9 @@ footer{padding:0 calc(28px + env(safe-area-inset-right)) calc(28px + env(safe-ar
   window.addEventListener('online',upd);window.addEventListener('offline',upd);upd();
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console.warn('SW registration failed',e);});
+      var had=!!navigator.serviceWorker.controller,done=false;
+      navigator.serviceWorker.addEventListener('controllerchange',function(){if(had&&!done){done=true;location.reload();}});
+      navigator.serviceWorker.register('sw.js',{scope:'./',updateViaCache:'none'}).then(function(r){r.update();}).catch(function(e){console.warn('SW registration failed',e);});
     });
   }
 })();
