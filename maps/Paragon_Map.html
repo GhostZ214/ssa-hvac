@@ -103,6 +103,14 @@ img{max-width:100%}
 #ask-sheet .as-err{color:#C0392B;font-size:13px;padding:0 12px}
 #ask-sheet .as-err:not(:empty){padding:6px 12px 0}
 </style>
+<style id="lbl-css">
+:root{--lz:1;--lb:9px}
+@media (min-width:700px){:root{--lb:10px}}
+.fpl,.lb,.lab,.pin>span,.m.fp>span:not(.fpl),.mk>span.lb{font-size:calc(var(--lb)*var(--lz))!important;line-height:1.15!important}
+.pin>span,.m.fp>span:not(.fpl),.lb{padding:0 calc(3px*var(--lz))!important}
+a.m.lbl-pill{font-size:calc((var(--lb) + 1px)*var(--lz))!important;display:inline-flex!important;align-items:center;justify-content:center;box-sizing:border-box}
+.mk>span.lb{top:auto!important;bottom:calc(100% + 2px*var(--lz))!important}
+</style>
 </head><body><header><b>Paragon Science Academy - Main Building Roof</b> &nbsp; Click a unit to open its row on the master list</header>
 <div class=ctl>Floor map overlay: <label><input type=radio name=o value=0 checked> None</label><label><input type=radio name=o value=1> 1st floor</label><label><input type=radio name=o value=2> 2nd floor</label>
 Opacity <input type=range id=op min=0 max=100 value=70><label><input type=checkbox id=lb checked> Labels</label>
@@ -255,5 +263,13 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(function(a){if(a
  anchor();addEventListener('load',anchor);addEventListener('resize',anchor);setTimeout(anchor,400);
  document.addEventListener('scroll',later,true);document.addEventListener('click',function(){setTimeout(later,150)},true);
  document.addEventListener('input',later,true);document.addEventListener('wheel',later,{capture:true,passive:true});setInterval(later,1500);
+})();</script>
+<script id="lbl-js">(function(){
+ var R=document.documentElement,vv=window.visualViewport;
+ /* Central Office-style text pills are the tap targets: keep their box, only shrink the text */
+ function pills(){[].forEach.call(document.querySelectorAll('a.m'),function(a){if(a.classList.contains('lbl-pill'))return;var r=a.getBoundingClientRect();if(!r.width)return;
+  var s=vv?vv.scale:1;a.style.minWidth=Math.round(r.width)+'px';a.style.minHeight=Math.round(r.height)+'px';a.classList.add('lbl-pill');});}
+ function upd(){var s=R.dataset.lzForce?+R.dataset.lzForce:(vv?vv.scale:1);var z=Math.max(.3,Math.min(1,1/(s||1)));R.style.setProperty('--lz',z.toFixed(3));}
+ pills();upd();addEventListener('load',function(){pills();upd()});if(vv){vv.addEventListener('resize',upd);}addEventListener('resize',upd);setTimeout(pills,500);
 })();</script>
 </body></html>
